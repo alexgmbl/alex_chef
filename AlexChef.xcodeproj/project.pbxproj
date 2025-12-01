@@ -63,7 +63,6 @@ A7A112DC292A0A2D00A09F4C /* AlexChef */ = {
 isa = PBXGroup;
 children = (
 A7A112F0292A0B2E00A09F4C /* App */,
-A7A11314299210E500A09F4C /* Persistence */,
 A7A112F1292A0B4100A09F4C /* Views */,
 A7A112F2292A0B5200A09F4C /* ViewModels */,
 A7A112F3292A0B5F00A09F4C /* Models */,
@@ -76,9 +75,10 @@ sourceTree = "<group>";
 A7A112F0292A0B2E00A09F4C /* App */ = {
 isa = PBXGroup;
 children = (
-A7A112F4292A0B7900A09F4C /* AlexChefApp.swift */
+A7A112F4292A0B7900A09F4C /* AlexChefApp.swift */,
+A7A112FB292A0B7900A09F4C /* Persistence.swift */
 );
-path = "";
+path = App;
 sourceTree = "<group>";
 };
 A7A112F1292A0B4100A09F4C /* Views */ = {
@@ -135,14 +135,6 @@ A7A11309292A0B7800A09F4C /* Preview Assets.xcassets */,
 A7A112FC292A0B7900A09F4C /* SampleData.swift */
 );
 path = "Preview Content";
-sourceTree = "<group>";
-};
-A7A11314299210E500A09F4C /* Persistence */ = {
-isa = PBXGroup;
-children = (
-A7A112FB292A0B7900A09F4C /* Persistence.swift */
-);
-path = Persistence;
 sourceTree = "<group>";
 };
 /* End PBXGroup section */

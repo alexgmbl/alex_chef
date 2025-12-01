@@ -6,7 +6,8 @@ AlexChef is a SwiftUI-based iOS application that helps home cooks discover, sear
 
 ```
 AlexChef/
-├── AlexChefApp.swift
+├── App
+│   └── AlexChefApp.swift
 ├── CoreData
 │   ├── FavoriteRecipe+CoreDataClass.swift
 │   ├── FavoriteRecipe+CoreDataProperties.swift
@@ -53,7 +54,7 @@ The Xcode project file lives at `AlexChef.xcodeproj`.
 ## Getting Started
 
 1. Clone the repository and open `AlexChef.xcodeproj` in Xcode.
-2. Select the shared **AlexChef** scheme and choose an iOS Simulator (e.g., iPhone 15 running the latest available iOS version).
+2. Select the **AlexChef** scheme and choose an iOS Simulator (e.g., iPhone 15 running the latest available iOS version).
 3. Press **⌘R** to build and run.
 
 ### Dependencies
@@ -74,7 +75,7 @@ Future shared dependencies can also be tracked with a `Package.resolved` file co
 
 ## Continuous Integration
 
-GitHub Actions runs `xcodebuild -scheme AlexChef` against the project on pushes and pull requests targeting `main` or `develop`. The workflow file is located at `.github/workflows/ios-ci.yml` and uses `macos-latest` runners with Xcode 16.2 and the latest iOS simulator runtime.
+GitHub Actions runs `xcodebuild` against the project on pushes and pull requests targeting `main` or `develop`. The workflow file is located at `.github/workflows/ios-ci.yml` and uses `macos-latest` runners with Xcode 16.2 and the latest iOS simulator runtime.
 
 ## Core Data Model
 
