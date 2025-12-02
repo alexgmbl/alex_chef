@@ -235,6 +235,7 @@
 				A7A11306292A0B7900A09F4C /* RecipeViewModel.swift in Sources */,
 				A7A11307292A0B7900A09F4C /* Persistence.swift in Sources */,
 				A7A11308292A0B7900A09F4C /* SampleData.swift in Sources */,
+				D96A851A2EE1938B004A5F61 /* RecipeModel.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,6 +438,19 @@
 			productName = FirebaseFirestore;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		D96A85182EE1938B004A5F61 /* RecipeModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				D96A85192EE1938B004A5F61 /* RecipeModel.xcdatamodel */,
+			);
+			currentVersion = D96A85192EE1938B004A5F61 /* RecipeModel.xcdatamodel */;
+			path = RecipeModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = A7A112DA292A0A2D00A09F4C /* Project object */;
 }
