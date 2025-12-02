@@ -20,7 +20,7 @@ jobs:
       - name: Build app
         run: |
           xcodebuild \
-            -workspace YourApp.xcworkspace \
-            -scheme YourApp \
+            -workspace AlexChef.xcworkspace \
+            -scheme AlexChef \
             -destination "generic/platform=iOS Simulator" \
             clean build
