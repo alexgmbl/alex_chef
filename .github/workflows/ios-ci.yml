@@ -8,20 +8,19 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
-
+    runs-on: macos-14
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Select Xcode
-        uses: maxim-lobanov/setup-xcode@v1
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          xcode-version: '16.2'
-
-      - name: Build
+          ruby-version: 3.1
+      - name: List available simulators
+        run: xcrun simctl list devices
+      - name: Build app
         run: |
-          xcodebuild -project AlexChef.xcodeproj \
-            -scheme AlexChef \
-            -destination 'generic/platform=iOS Simulator' \
+          xcodebuild \
+            -workspace YourApp.xcworkspace \
+            -scheme YourApp \
+            -destination "generic/platform=iOS Simulator" \
             clean build
