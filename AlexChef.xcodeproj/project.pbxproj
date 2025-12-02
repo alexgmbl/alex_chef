@@ -16,12 +16,10 @@
 		A7A11306292A0B7900A09F4C /* RecipeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A112FA292A0B7900A09F4C /* RecipeViewModel.swift */; };
 		A7A11307292A0B7900A09F4C /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A112FB292A0B7900A09F4C /* Persistence.swift */; };
 		A7A11308292A0B7900A09F4C /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A112FC292A0B7900A09F4C /* SampleData.swift */; };
-		A7A11309292A0B7900A09F4C /* FavoriteRecipe+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A112FD292A0B7900A09F4C /* FavoriteRecipe+CoreDataClass.swift */; };
-		A7A1130A292A0B7900A09F4C /* FavoriteRecipe+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A112FE292A0B7900A09F4C /* FavoriteRecipe+CoreDataProperties.swift */; };
 		A7A1130B292A0B7900A09F4C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7A112FF292A0B7900A09F4C /* Assets.xcassets */; };
 		A7A1130C292A0B7900A09F4C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A7A11309292A0B7800A09F4C /* Preview Assets.xcassets */; };
-		A7A1130E292A0B7900A09F4C /* RecipeModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A7A1130B292A0B7800A09F4C /* RecipeModel.xcdatamodeld */; };
 		A7A11313292A0E4A00A09F4C /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = A7A11311292A0E4A00A09F4C /* FirebaseFirestore */; };
+		D9E8C7B62EE1A334003138B6 /* RecipeModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D9E8C7B42EE1A334003138B6 /* RecipeModel.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,13 +32,11 @@
 		A7A112FA292A0B7900A09F4C /* RecipeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeViewModel.swift; sourceTree = "<group>"; };
 		A7A112FB292A0B7900A09F4C /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		A7A112FC292A0B7900A09F4C /* SampleData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleData.swift; sourceTree = "<group>"; };
-		A7A112FD292A0B7900A09F4C /* FavoriteRecipe+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FavoriteRecipe+CoreDataClass.swift"; sourceTree = "<group>"; };
-		A7A112FE292A0B7900A09F4C /* FavoriteRecipe+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FavoriteRecipe+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		A7A112FF292A0B7900A09F4C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A7A11309292A0B7800A09F4C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A7A1130A292A0B7800A09F4C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A7A1130B292A0B7800A09F4C /* RecipeModel.xcdatamodeld */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodeld; path = RecipeModel.xcdatamodeld; sourceTree = "<group>"; };
 		A7A1130F292A0B7D00A09F4C /* AlexChef.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlexChef.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D9E8C7B52EE1A334003138B6 /* RecipeModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = RecipeModel.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,9 +118,7 @@
 		A7A11307292A0BCA00A09F4C /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				A7A1130B292A0B7800A09F4C /* RecipeModel.xcdatamodeld */,
-				A7A112FD292A0B7900A09F4C /* FavoriteRecipe+CoreDataClass.swift */,
-				A7A112FE292A0B7900A09F4C /* FavoriteRecipe+CoreDataProperties.swift */,
+				D9E8C7B42EE1A334003138B6 /* RecipeModel.xcdatamodeld */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -223,9 +217,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7A1130E292A0B7900A09F4C /* RecipeModel.xcdatamodeld in Sources */,
-				A7A11309292A0B7900A09F4C /* FavoriteRecipe+CoreDataClass.swift in Sources */,
-				A7A1130A292A0B7900A09F4C /* FavoriteRecipe+CoreDataProperties.swift in Sources */,
 				A7A11300292A0B7900A09F4C /* AlexChefApp.swift in Sources */,
 				A7A11301292A0B7900A09F4C /* HomeView.swift in Sources */,
 				A7A11302292A0B7900A09F4C /* SearchView.swift in Sources */,
@@ -235,7 +226,7 @@
 				A7A11306292A0B7900A09F4C /* RecipeViewModel.swift in Sources */,
 				A7A11307292A0B7900A09F4C /* Persistence.swift in Sources */,
 				A7A11308292A0B7900A09F4C /* SampleData.swift in Sources */,
-				D96A851A2EE1938B004A5F61 /* RecipeModel.xcdatamodeld in Sources */,
+				D9E8C7B62EE1A334003138B6 /* RecipeModel.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,7 +351,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "AlexChef/Resources/Preview Content";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = AlexChef/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -381,7 +372,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_ASSET_PATHS = "AlexChef/Resources/Preview Content";
+				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = AlexChef/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
@@ -440,12 +431,12 @@
 /* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
-		D96A85182EE1938B004A5F61 /* RecipeModel.xcdatamodeld */ = {
+		D9E8C7B42EE1A334003138B6 /* RecipeModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				D96A85192EE1938B004A5F61 /* RecipeModel.xcdatamodel */,
+				D9E8C7B52EE1A334003138B6 /* RecipeModel.xcdatamodel */,
 			);
-			currentVersion = D96A85192EE1938B004A5F61 /* RecipeModel.xcdatamodel */;
+			currentVersion = D9E8C7B52EE1A334003138B6 /* RecipeModel.xcdatamodel */;
 			path = RecipeModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
