@@ -19,8 +19,7 @@ jobs:
         run: xcrun simctl list devices
       - name: Build app
         run: |
-          xcodebuild \
-            -workspace AlexChef.xcworkspace \
+          xcodebuild -project AlexChef.xcodeproj \
             -scheme AlexChef \
-            -destination "generic/platform=iOS Simulator" \
+            -destination 'generic/platform=iOS Simulator' \
             clean build
