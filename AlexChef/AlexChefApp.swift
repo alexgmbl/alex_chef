@@ -30,6 +30,13 @@ struct RootView: View {
             }
 
             NavigationStack {
+                IngredientInputView()
+            }
+            .tabItem {
+                Label("Ingredients", systemImage: "text.badge.plus")
+            }
+
+            NavigationStack {
                 FavoritesView()
             }
             .tabItem {
