@@ -107,6 +107,8 @@ struct IngredientInputView: View {
                 }
             }
 
+            languagePicker
+
             HStack(spacing: 16) {
                 Button(action: handleMicrophoneTap) {
                     Label(viewModel.speechState == .recording ? "Stop" : "Start Recording", systemImage: viewModel.speechState == .recording ? "stop.circle" : "mic.circle")
@@ -121,6 +123,35 @@ struct IngredientInputView: View {
                 .disabled(viewModel.speechState == .authorized || viewModel.speechState == .recording)
             }
             .buttonStyle(.borderedProminent)
+        }
+    }
+
+    private var languagePicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label("Language & Accent", systemImage: "globe")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Toggle("On-device", isOn: $viewModel.prefersOnDeviceRecognition)
+                    .labelsHidden()
+                    .toggleStyle(.switch)
+                    .accessibilityLabel("Prefer on-device speech recognition")
+            }
+
+            Picker("Speech Language", selection: Binding(
+                get: { viewModel.selectedSpeechLocale.identifier },
+                set: { identifier in
+                    if let locale = viewModel.supportedSpeechLocales.first(where: { $0.identifier == identifier }) {
+                        viewModel.updateSpeechRecognizer(with: locale)
+                    }
+                }
+            )) {
+                ForEach(viewModel.supportedSpeechLocales, id: \.identifier) { locale in
+                    Text(locale.localizedString(forIdentifier: locale.identifier) ?? locale.identifier)
+                        .tag(locale.identifier)
+                }
+            }
+            .pickerStyle(.menu)
         }
     }
 
@@ -192,17 +223,44 @@ struct IngredientInputView: View {
                 }
             }
 
-            if !viewModel.recognizedObjects.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Suggested Ingredients from Photo")
-                        .font(.headline)
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 8)], spacing: 8) {
-                        ForEach(viewModel.recognizedObjects, id: \.self) { label in
-                            Text(label)
-                                .font(.subheadline)
-                                .padding(8)
-                                .frame(maxWidth: .infinity)
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.accentColor.opacity(0.1)))
+            if !viewModel.recognizedIngredients.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("Suggested Ingredients from Photo")
+                            .font(.headline)
+                        Spacer()
+                        Button("Add All to List") {
+                            viewModel.addRecognizedIngredientsToList()
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 180), spacing: 8)], spacing: 8) {
+                        ForEach(viewModel.recognizedIngredients) { item in
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(item.name)
+                                    .font(.subheadline.weight(.semibold))
+                                    .lineLimit(2)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                HStack {
+                                    Text("\(Int(item.confidence * 100))% confidence")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                    Spacer()
+                                    Button("Add") {
+                                        viewModel.addRecognizedIngredientsToList([item])
+                                    }
+                                    .buttonStyle(.bordered)
+                                }
+                                if !item.source.isEmpty {
+                                    Text(item.source)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .padding(10)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(RoundedRectangle(cornerRadius: 12).fill(Color.accentColor.opacity(0.08)))
                         }
                     }
                 }
