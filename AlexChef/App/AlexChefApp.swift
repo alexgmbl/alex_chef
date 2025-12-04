@@ -30,6 +30,13 @@ struct RootView: View {
             }
 
             NavigationStack {
+                GPTRecipeView()
+            }
+            .tabItem {
+                Label("AI Chef", systemImage: "sparkles")
+            }
+
+            NavigationStack {
                 FavoritesView()
             }
             .tabItem {
