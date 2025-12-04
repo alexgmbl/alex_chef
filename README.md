@@ -105,6 +105,15 @@ Favorites and notes are stored locally, making recipes readable and editable off
 - Add authentication and personalized recommendations powered by GPT.
 - Expand unit/UI test coverage and add automated UI snapshot tests.
 
+## Epic 8 – UI/UX Refinement & Testing
+
+**Objective:** Polish the user experience and ensure reliability across accessibility, theming, performance, and testing.
+
+- **Accessibility & Internationalization:** Support dynamic type sizing throughout the app, ensure VoiceOver coverage with meaningful labels, and localize copy for multiple languages.
+- **Theming and UI Design:** Apply a consistent color palette with dark and light modes, cohesive iconography, and lightweight animations that keep interactions responsive.
+- **Testing:** Add unit tests for data models and integration tests for API calls, and conduct user testing sessions to capture qualitative feedback.
+- **Performance Optimization:** Profile memory usage and API latency, and make offline/online state handling resilient so core features keep working without connectivity.
+
 ## License
 
 This project is currently proprietary. Update this section once a license is chosen.
