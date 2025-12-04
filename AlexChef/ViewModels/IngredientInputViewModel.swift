@@ -6,6 +6,13 @@ import UIKit
 
 @MainActor
 final class IngredientInputViewModel: NSObject, ObservableObject {
+    struct RecognizedIngredient: Identifiable, Hashable {
+        let id = UUID()
+        let name: String
+        let confidence: Double
+        let source: String
+    }
+
     enum SpeechState: String {
         case idle = "Idle"
         case requesting = "Requesting Permission"
@@ -23,13 +30,29 @@ final class IngredientInputViewModel: NSObject, ObservableObject {
     @Published private(set) var speechError: String?
     @Published private(set) var visionStatusMessage: String?
     @Published private(set) var recognizedTextFromImage: String = ""
-    @Published private(set) var recognizedObjects: [String] = []
+    @Published private(set) var recognizedIngredients: [RecognizedIngredient] = []
+    @Published var selectedSpeechLocale: Locale
+    @Published var prefersOnDeviceRecognition: Bool = false
 
-    private let speechRecognizer = SFSpeechRecognizer()
+    let supportedSpeechLocales: [Locale]
+
+    private var speechRecognizer: SFSpeechRecognizer?
     private let audioEngine = AVAudioEngine()
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private var hasAudioTap = false
+
+    override init() {
+        let supportedLocales = Array(SFSpeechRecognizer.supportedLocales()).sorted { lhs, rhs in
+            let lhsName = lhs.localizedString(forIdentifier: lhs.identifier) ?? lhs.identifier
+            let rhsName = rhs.localizedString(forIdentifier: rhs.identifier) ?? rhs.identifier
+            return lhsName < rhsName
+        }
+        supportedSpeechLocales = supportedLocales
+        selectedSpeechLocale = supportedLocales.first { $0.identifier == Locale.current.identifier } ?? Locale(identifier: "en_US")
+        super.init()
+        updateSpeechRecognizer(with: selectedSpeechLocale)
+    }
 
     func parseIngredients() {
         let separators = CharacterSet(charactersIn: ",\n;•\t")
@@ -44,9 +67,16 @@ final class IngredientInputViewModel: NSObject, ObservableObject {
         rawTextInput = ""
         parsedIngredients = []
         recognizedTextFromImage = ""
-        recognizedObjects = []
+        recognizedIngredients = []
         visionStatusMessage = nil
         speechError = nil
+    }
+
+    func updateSpeechRecognizer(with locale: Locale) {
+        selectedSpeechLocale = locale
+        speechRecognizer = SFSpeechRecognizer(locale: locale)
+        speechRecognizer?.defaultTaskHint = .dictation
+        speechError = speechRecognizer == nil ? "Selected language is not supported for speech recognition." : nil
     }
 
     func requestSpeechAuthorization() {
@@ -77,6 +107,12 @@ final class IngredientInputViewModel: NSObject, ObservableObject {
             return
         }
 
+        guard speechRecognizer != nil else {
+            speechState = .error
+            speechError = "Selected speech language is not available on this device."
+            return
+        }
+
         if speechState == .idle {
             requestSpeechAuthorization()
             return
@@ -92,6 +128,7 @@ final class IngredientInputViewModel: NSObject, ObservableObject {
             return
         }
 
+        recognitionRequest.requiresOnDeviceRecognition = prefersOnDeviceRecognition
         recognitionRequest.shouldReportPartialResults = true
         speechState = .recording
         speechError = nil
@@ -147,25 +184,17 @@ final class IngredientInputViewModel: NSObject, ObservableObject {
     }
 
     func processPickedImage(_ image: UIImage) {
-        let classificationRequest = makeClassificationRequest()
-        visionStatusMessage = classificationRequest == nil ? "Scanning text (object suggestions require iOS 17+)." : "Processing image…"
+        visionStatusMessage = "Processing image…"
         recognizedTextFromImage = ""
-        recognizedObjects = []
+        recognizedIngredients = []
 
         guard let cgImage = image.cgImage else {
             visionStatusMessage = "Unable to read image."
             return
         }
 
-        let requests = [makeTextRequest(), classificationRequest].compactMap { $0 }
-        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-
         Task {
-            do {
-                try handler.perform(requests)
-            } catch {
-                self.visionStatusMessage = "Vision processing failed: \(error.localizedDescription)"
-            }
+            await performImageAnalysis(on: cgImage)
         }
     }
 
@@ -204,33 +233,157 @@ final class IngredientInputViewModel: NSObject, ObservableObject {
         return request
     }
 
-    private func makeClassificationRequest() -> VNImageBasedRequest? {
-        if #available(iOS 17.0, *) {
-            let request = VNClassifyImageRequest { [weak self] request, error in
-                guard let self else { return }
-                Task { @MainActor in
-                    if let error {
-                        self.visionStatusMessage = "Classification failed: \(error.localizedDescription)"
-                        return
-                    }
+    private func performImageAnalysis(on cgImage: CGImage) async {
+        let textRequest = makeTextRequest()
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
 
-                    guard let results = request.results as? [VNClassificationObservation] else { return }
-                    let probableIngredients = results
-                        .filter { $0.confidence > 0.25 }
-                        .prefix(5)
-                        .map { "\($0.identifier) \(Int($0.confidence * 100))%" }
-
-                    if !probableIngredients.isEmpty {
-                        self.recognizedObjects = probableIngredients
-                        self.visionStatusMessage = "Identified possible ingredients."
-                    }
-                }
+        do {
+            try handler.perform([textRequest])
+        } catch {
+            await MainActor.run {
+                self.visionStatusMessage = "Vision processing failed: \(error.localizedDescription)"
             }
-            //request.maximumObservations = 8
-            //return request
         }
 
-        return nil
+        guard #available(iOS 17.0, *) else {
+            await MainActor.run {
+                self.visionStatusMessage = "Text extracted. Object suggestions require iOS 17+."
+            }
+            return
+        }
+
+        await runFoodRecognition(for: cgImage)
+    }
+
+    @available(iOS 17.0, *)
+    private func runFoodRecognition(for cgImage: CGImage) async {
+        visionStatusMessage = "Identifying ingredients…"
+
+        do {
+            async let fullImageResults = classifyFood(in: cgImage, source: "Whole photo")
+            async let regionResults = classifySalientRegions(in: cgImage)
+            let combined = deduplicateIngredients(try await (fullImageResults + regionResults))
+
+            await MainActor.run {
+                self.recognizedIngredients = combined
+                if combined.isEmpty {
+                    self.visionStatusMessage = "No obvious food items detected."
+                } else {
+                    self.visionStatusMessage = "Identified possible ingredients."
+                }
+            }
+        } catch {
+            await MainActor.run {
+                self.visionStatusMessage = "Classification failed: \(error.localizedDescription)"
+            }
+        }
+    }
+
+    @available(iOS 17.0, *)
+    private func classifyFood(in cgImage: CGImage, source: String, region: CGRect? = nil) async throws -> [RecognizedIngredient] {
+        try await withCheckedThrowingContinuation { continuation in
+            let request = VNClassifyImageRequest { request, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+
+                guard let results = request.results as? [VNClassificationObservation] else {
+                    continuation.resume(returning: [])
+                    return
+                }
+
+                let ingredients = results
+                    .filter { $0.confidence > 0.18 }
+                    .prefix(8)
+                    .map { RecognizedIngredient(name: $0.identifier, confidence: Double($0.confidence), source: source) }
+
+                continuation.resume(returning: Array(ingredients))
+            }
+
+            request.preferBackgroundProcessing = true
+
+            do {
+                let handler: VNImageRequestHandler
+                if let region {
+                    let croppingRect = VNImageRectForNormalizedRect(region, cgImage.width, cgImage.height)
+                    guard let cropped = cgImage.cropping(to: croppingRect) else {
+                        continuation.resume(returning: [])
+                        return
+                    }
+                    handler = VNImageRequestHandler(cgImage: cropped, options: [:])
+                } else {
+                    handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+                }
+
+                try handler.perform([request])
+            } catch {
+                continuation.resume(throwing: error)
+            }
+        }
+    }
+
+    @available(iOS 17.0, *)
+    private func classifySalientRegions(in cgImage: CGImage) async throws -> [RecognizedIngredient] {
+        let saliencyRequest = VNGenerateAttentionBasedSaliencyImageRequest()
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        try handler.perform([saliencyRequest])
+
+        guard let results = saliencyRequest.results?.first as? VNSaliencyImageObservation else {
+            return []
+        }
+
+        let regions = results.salientObjects?.prefix(4) ?? []
+
+        return try await withThrowingTaskGroup(of: [RecognizedIngredient].self) { group in
+            for (index, region) in regions.enumerated() {
+                let boundingBox = region.boundingBox
+                group.addTask { [cgImage] in
+                    try await self.classifyFood(in: cgImage, source: "Region \(index + 1)", region: boundingBox)
+                }
+            }
+
+            var regionIngredients: [RecognizedIngredient] = []
+            for try await items in group {
+                regionIngredients.append(contentsOf: items)
+            }
+
+            return regionIngredients
+        }
+    }
+
+    private func deduplicateIngredients(_ items: [RecognizedIngredient]) -> [RecognizedIngredient] {
+        var bestByName: [String: RecognizedIngredient] = [:]
+
+        for item in items {
+            let key = item.name.lowercased()
+            if let current = bestByName[key] {
+                if item.confidence > current.confidence {
+                    bestByName[key] = item
+                }
+            } else {
+                bestByName[key] = item
+            }
+        }
+
+        return bestByName.values.sorted { $0.confidence > $1.confidence }
+    }
+
+    func addRecognizedIngredientsToList(_ items: [RecognizedIngredient]? = nil) {
+        let additions = (items ?? recognizedIngredients).map { $0.name }
+        appendIngredientsToInput(additions)
+    }
+
+    private func appendIngredientsToInput(_ names: [String]) {
+        guard !names.isEmpty else { return }
+        let newLines = names.joined(separator: "\n")
+
+        if !rawTextInput.isEmpty && !rawTextInput.hasSuffix("\n") {
+            rawTextInput += "\n"
+        }
+
+        rawTextInput += newLines
+        parseIngredients()
     }
 
     private func prepareAudioSession() {
