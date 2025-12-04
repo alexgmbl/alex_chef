@@ -36,7 +36,9 @@ The Xcode project file lives at `AlexChef.xcodeproj`.
 ## Features
 
 - **SwiftUI-first UI** with tab navigation for Home, Search, and Favorites.
+- **GPT-powered recipe studio** to generate and iterate on recipes from pantry ingredients, including follow-up adjustments.
 - **Core Data integration** via `NSPersistentCloudKitContainer`, enabling offline storage and future-ready iCloud sync.
+- **External recipe search** powered by Spoonacular-compatible endpoints with GPT-assisted natural-language filtering and result summaries.
 - **Composable architecture** with view models, models, and persistence separated into dedicated folders.
 - **Preview-friendly sample data** to experiment quickly with UI states.
 
@@ -56,6 +58,24 @@ The Xcode project file lives at `AlexChef.xcodeproj`.
 1. Clone the repository and open `AlexChef.xcodeproj` in Xcode.
 2. Select the **AlexChef** scheme and choose an iOS Simulator (e.g., iPhone 15 running the latest available iOS version).
 3. Press **⌘R** to build and run.
+
+### Configuring the GPT proxy
+
+The AI recipe studio calls a server-side GPT proxy so keys never ship in the app bundle. Add the following keys to `Resources/Info.plist` (or supply them at build time via configuration files):
+
+- `GPT_PROXY_URL`: The HTTPS endpoint that wraps the OpenAI API and returns a JSON-encoded recipe payload.
+- `GPT_PROXY_TOKEN` (optional): A bearer token the proxy uses to authorize clients.
+
+When these keys are absent, the app falls back to mock recipes to keep previews and UI flows working without network access.
+
+### Configuring the recipe search API
+
+The search tab queries Spoonacular-compatible endpoints when available. Add the following keys to `Resources/Info.plist`:
+
+- `RECIPE_API_KEY`: Your Spoonacular (or compatible) API key.
+- `RECIPE_API_URL` (optional): Override the base search endpoint. Defaults to `https://api.spoonacular.com/recipes/complexSearch`.
+
+If these values are missing, the search experience will gracefully fall back to local sample data while keeping the UI responsive.
 
 ### Dependencies
 
