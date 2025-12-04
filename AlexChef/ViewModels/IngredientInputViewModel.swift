@@ -226,8 +226,8 @@ final class IngredientInputViewModel: NSObject, ObservableObject {
                     }
                 }
             }
-            request.maximumObservations = 8
-            return request
+            //request.maximumObservations = 8
+            //return request
         }
 
         return nil
