@@ -68,15 +68,6 @@ The AI recipe studio calls a server-side GPT proxy so keys never ship in the app
 
 When these keys are absent, the app falls back to mock recipes to keep previews and UI flows working without network access.
 
-### Configuring the recipe search API
-
-The search tab queries Spoonacular-compatible endpoints when available. Add the following keys to `Resources/Info.plist`:
-
-- `RECIPE_API_KEY`: Your Spoonacular (or compatible) API key.
-- `RECIPE_API_URL` (optional): Override the base search endpoint. Defaults to `https://api.spoonacular.com/recipes/complexSearch`.
-
-If these values are missing, the search experience will gracefully fall back to local sample data while keeping the UI responsive.
-
 ### Dependencies
 
 The project is configured to use Swift Package Manager.
