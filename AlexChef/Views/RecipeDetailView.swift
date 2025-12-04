@@ -45,7 +45,7 @@ struct RecipeDetailView: View {
             }
         }
         .onAppear(perform: syncNotes)
-        .onChange(of: savedRecipe?.notes) { _, _ in
+        .onChange(of: savedRecipe?.notes) { newValue in
             syncNotes()
         }
     }
