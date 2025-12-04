@@ -31,5 +31,13 @@
     <array>
         <string>UIInterfaceOrientationPortrait</string>
     </array>
+    <key>GPT_PROXY_TOKEN</key>
+    <string></string>
+    <key>GPT_PROXY_URL</key>
+    <string></string>
+    <key>RECIPE_API_KEY</key>
+    <string></string>
+    <key>RECIPE_API_URL</key>
+    <string>https://api.spoonacular.com/recipes/complexSearch</string>
 </dict>
 </plist>

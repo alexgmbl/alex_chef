@@ -38,6 +38,7 @@ The Xcode project file lives at `AlexChef.xcodeproj`.
 - **SwiftUI-first UI** with tab navigation for Home, Search, and Favorites.
 - **GPT-powered recipe studio** to generate and iterate on recipes from pantry ingredients, including follow-up adjustments.
 - **Core Data integration** via `NSPersistentCloudKitContainer`, enabling offline storage and future-ready iCloud sync.
+- **External recipe search** powered by Spoonacular-compatible endpoints with GPT-assisted natural-language filtering and result summaries.
 - **Composable architecture** with view models, models, and persistence separated into dedicated folders.
 - **Preview-friendly sample data** to experiment quickly with UI states.
 
