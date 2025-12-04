@@ -90,7 +90,13 @@ GitHub Actions runs `xcodebuild` against the project on pushes and pull requests
 
 ## Core Data Model
 
-The initial data model defines a `FavoriteRecipe` entity with `id`, `title`, `subtitle`, and `recipeDescription` attributes. Favorite management is wired into the UI, allowing users to save and remove recipes from their personal list.
+Local storage is powered by Core Data with the following entities:
+
+- `Recipe`: Persists saved recipes (id, title, subtitle, description, category, instructions, personal notes, lastUpdated) and cascades to related ingredients.
+- `Ingredient`: Stores each ingredient’s name/quantity and links back to its recipe for offline access.
+- `UserPreferences`: Tracks dietary restrictions and preferred units so personalization survives app restarts.
+
+Favorites and notes are stored locally, making recipes readable and editable offline. The stack continues to use `NSPersistentCloudKitContainer`, keeping the door open for future CloudKit/Firebase sync.
 
 ## Next Steps
 

@@ -27,11 +27,31 @@ struct PersistenceController {
         let controller = PersistenceController(inMemory: true)
         let viewContext = controller.container.viewContext
         for recipe in SampleData.recipes {
-            let favorite = FavoriteRecipe(context: viewContext)
-            favorite.id = recipe.id
-            favorite.title = recipe.title
-            favorite.subtitle = recipe.subtitle
+            let savedRecipe = PersistentRecipe(context: viewContext)
+            savedRecipe.id = recipe.id
+            savedRecipe.title = recipe.title
+            savedRecipe.subtitle = recipe.subtitle
+            savedRecipe.recipeDescription = recipe.description
+            savedRecipe.category = recipe.category.rawValue
+            savedRecipe.instructions = recipe.instructions
+            savedRecipe.lastUpdated = Date()
+
+            let ingredients = recipe.ingredients.map { name -> Ingredient in
+                let ingredient = Ingredient(context: viewContext)
+                ingredient.id = UUID()
+                ingredient.name = name
+                ingredient.recipe = savedRecipe
+                return ingredient
+            }
+
+            savedRecipe.ingredients = NSSet(array: ingredients)
         }
+
+        let preferences = UserPreferences(context: viewContext)
+        preferences.id = UUID()
+        preferences.preferredUnits = "system"
+        preferences.dietaryRestrictions = ["vegetarian"]
+        preferences.updatedAt = Date()
         do {
             try viewContext.save()
         } catch {

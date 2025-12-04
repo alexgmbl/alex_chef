@@ -3,15 +3,28 @@ import SwiftUI
 
 struct RecipeDetailView: View {
     @Environment(\.managedObjectContext) private var viewContext
-    @FetchRequest(
-        sortDescriptors: [],
-        animation: .default
-    ) private var favorites: FetchedResults<FavoriteRecipe>
+
+    @FetchRequest private var savedRecipes: FetchedResults<PersistentRecipe>
+
+    @State private var notesText: String = ""
 
     let recipe: Recipe
 
     var isFavorite: Bool {
-        favorites.contains(where: { $0.id == recipe.id })
+        savedRecipes.contains(where: { $0.id == recipe.id })
+    }
+
+    private var savedRecipe: PersistentRecipe? {
+        savedRecipes.first
+    }
+
+    init(recipe: Recipe) {
+        self.recipe = recipe
+        _savedRecipes = FetchRequest(
+            sortDescriptors: [],
+            predicate: NSPredicate(format: "id == %@", recipe.id as CVarArg),
+            animation: .default
+        )
     }
 
     var body: some View {
@@ -21,6 +34,7 @@ struct RecipeDetailView: View {
                 descriptionSection
                 ingredientsSection
                 instructionsSection
+                notesSection
             }
             .padding()
         }
@@ -29,6 +43,10 @@ struct RecipeDetailView: View {
             Button(action: toggleFavorite) {
                 Label(isFavorite ? "Remove Favorite" : "Save", systemImage: isFavorite ? "heart.fill" : "heart")
             }
+        }
+        .onAppear(perform: syncNotes)
+        .onChange(of: savedRecipe?.notes) { _, _ in
+            syncNotes()
         }
     }
 
@@ -86,22 +104,59 @@ struct RecipeDetailView: View {
         }
     }
 
-    private func toggleFavorite() {
-        if let favorite = favorites.first(where: { $0.id == recipe.id }) {
-            viewContext.delete(favorite)
-        } else {
-            let favorite = FavoriteRecipe(context: viewContext)
-            favorite.id = recipe.id
-            favorite.title = recipe.title
-            favorite.subtitle = recipe.subtitle
-            favorite.recipeDescription = recipe.description
+    private var notesSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Your Notes")
+                    .font(.title2.weight(.semibold))
+                if savedRecipe != nil {
+                    Spacer()
+                    Button("Save Notes", action: saveNotes)
+                        .buttonStyle(.bordered)
+                }
+            }
+
+            if savedRecipe == nil {
+                Text("Save this recipe to start adding personal notes and tweaks.")
+                    .foregroundStyle(.secondary)
+            } else {
+                TextEditor(text: $notesText)
+                    .frame(minHeight: 120)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                    )
+            }
         }
+    }
+
+    private func toggleFavorite() {
+        let storage = RecipeStorage(context: viewContext)
 
         do {
-            try viewContext.save()
+            if let savedRecipe {
+                try storage.delete(recipe: savedRecipe)
+                notesText = ""
+            } else {
+                try storage.save(recipe: recipe, notes: notesText)
+            }
         } catch {
-            let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            print("Failed to update favorites: \(error)")
         }
+    }
+
+    private func saveNotes() {
+        guard let savedRecipe else { return }
+        let storage = RecipeStorage(context: viewContext)
+
+        do {
+            try storage.update(recipe: savedRecipe, notes: notesText)
+        } catch {
+            print("Failed to save notes: \(error)")
+        }
+    }
+
+    private func syncNotes() {
+        notesText = savedRecipe?.notes ?? ""
     }
 }
